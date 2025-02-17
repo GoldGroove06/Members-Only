@@ -1,5 +1,6 @@
-const {getAllUsers} = require("../db/queries")
-const { body, param } = require("express-validator");
+const { validationResult } = require("express-validator");
+const bcryptjs = require("bcryptjs")
+const db = require("../db/queries");
    
 async function getSignup(req, res) {
     try{
@@ -12,12 +13,28 @@ async function getSignup(req, res) {
 
 async function postSignup(req, res) {
           try{
-              const {name, email, password} = req.body
-              console.log(name, email, password)
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+              return res.status(400).json({ errors: errors.array() });
+            }
+              const {name, email, password, confirmPassword} = req.body
+
+              if (password != confirmPassword) {
+                return res.status(400).json({ errors: "password doest match" });
+              }
+
+              if (name && email && password) {
+                const salt = await bcryptjs.genSalt(10)
+                const hashedPassword = await bcryptjs.hash(password, salt)
+                await db.CreateNewUser([name, email, hashedPassword])
+                res.status(200).send("signup successful")
+            }
+            
+            res.status(500).send("internal server error")
 
               
 
-              res.status(200).send("signup successful")
+              
           }
           catch (error){
               console.error(error)
