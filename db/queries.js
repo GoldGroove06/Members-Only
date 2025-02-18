@@ -7,6 +7,7 @@ async function getUser(email) {
 
 async function CreateNewUser(data) {
   const { rows }  = await pool.query("INSERT INTO users Values($1, $2, $3)", data)
+  return rows;
 }
 
 
