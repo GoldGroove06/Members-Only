@@ -2,6 +2,11 @@
     <body>
        <div>
         HLo
+
+        <% if (user) { %>
+            <h1>WELCOME BACK <%= user.email %></h1>
+        <% } %>
+          
        </div>
     </body>
 </html>
